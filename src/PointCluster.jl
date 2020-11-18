@@ -1,6 +1,7 @@
 module PointCluster
 
 using LightGraphs
+using Rectangle
 
 export Point
 export Cluster
@@ -13,9 +14,10 @@ end
 struct Cluster
 	points::Vector{Point}
 	graph::Graph
+	rect::Rect
 end
 
-Cluster() = Cluster([],SimpleGraph(0))
+Cluster() = Cluster([],SimpleGraph(0),Rect(0,0,0,0))
 
 export add_point_to_cluster
 function add_point_to_cluster(cluster::Cluster,p::Point)

@@ -1,6 +1,6 @@
 module PointCluster
 
-using LightGraphs
+using LightGraphs, SimpleWeightedGraphs
 using Rectangle
 
 export Point
@@ -17,7 +17,7 @@ struct Cluster
 	rect::Rect
 end
 
-Cluster() = Cluster([],SimpleGraph(0),Rect(0,0,0,0))
+Cluster() = Cluster([],SimpleWeightedGraph(0),Rect(0,0,0,0))
 
 export add_point_to_cluster
 function add_point_to_cluster(cluster::Cluster,p::Point)

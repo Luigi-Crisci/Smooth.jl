@@ -5,7 +5,7 @@ include("PointCluster.jl")
 using Revise
 using .PointCluster
 using LightGraphs
-# using GraphPlot
+using GraphPlot
 
 cluster = Cluster()
 # gplot(cluster.graph)

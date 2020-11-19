@@ -19,6 +19,8 @@ end
 
 Cluster() = Cluster([],SimpleWeightedGraph(0),Rect(0,0,0,0))
 
+
+
 export add_point_to_cluster
 function add_point_to_cluster(cluster::Cluster,p::Point)
 	push!(cluster.points,p)
@@ -26,6 +28,11 @@ function add_point_to_cluster(cluster::Cluster,p::Point)
 	for i = 1:nv(cluster.graph)-1
 		add_edge!(cluster.graph,i,nv(cluster.graph))
 	end
+end
+
+export is_inside_cluster
+function is_inside_cluster(cluster::Cluster,p::Point)
+	return inside((p.x,p.y),cluster.rect)
 end
 
 end

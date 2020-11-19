@@ -40,5 +40,9 @@ function is_inside_another_cluster(canvas::Canvas,point::Point,index<:Number)
 		return true
 	else
 		for i in vcat(1:index-1,index+1:length(canvas.clusters))
+			if is_inside_cluster(canvas.clusters[i],point)
+				return false
+		end
+		return true
 	end
 end

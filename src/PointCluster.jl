@@ -12,27 +12,31 @@ mutable struct Cluster
 	rect::Rect
 end
 
-Cluster() = Cluster([],SimpleWeightedGraph(0),
-						Rect([[0,0] [0,0] ]))
+Cluster() = Cluster([],SimpleWeightedGraph(0), Rect([ [0,0] [0,0] ]))
 
 
 export add_point_to_cluster
 function add_point_to_cluster(cluster::Cluster,p::Tuple{Int64,Int64})
+	if p in cluster.points
+		return false
+	end
+
 	push!(cluster.points,p)
-	#TODO:Change Vector with Set
 	add_vertex!(cluster.graph)
 	for i = 1:nv(cluster.graph)-1
 		add_edge!(cluster.graph,i,nv(cluster.graph),
 					node_distance(cluster.points[i],cluster.points[nv(cluster.graph)]))
 	end
 	update_rect(cluster::Cluster,p::Tuple{Int64,Int64})
+	return true
 end
 
 function node_distance(p1::Tuple,p2::Tuple)
-	return evaluate(Euclidean(),collect(p1),collect(p2))
+	return round(evaluate(Euclidean(),collect(p1),collect(p2)),digits=3)
 end
 
 # That's sad
+#TODO: Add trasmission range
 export update_rect
 function update_rect(cluster::Cluster,p::Tuple{Int64,Int64})
 	if length(cluster.points) == 1
@@ -60,7 +64,6 @@ end
 export is_inside_cluster
 function is_inside_cluster(cluster::Cluster,p::Tuple{Int64,Int64})
 	return inside(p,cluster.rect)
-
 end
 
 end

@@ -69,6 +69,7 @@ function generate_groups(number_waypoints::Int)
 	return groups
 end
 
+#TODO: Collapse point generation point functions into one, with acceptance funcion as parameter 
 export generate_group_internal_point
 function generate_group_internal_point(canvas::Canvas,R::Int64,cluster::Cluster)
 	t = ceil(Int,0.1 * R)

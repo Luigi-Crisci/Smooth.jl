@@ -17,35 +17,35 @@ Canvas(x::Int64,y::Int64) = Canvas(x, y, [], 0)
 
 export initialize
 function initialize(canvas::Canvas, num_clusters::Int64, num_waypoints::Int64, trasmission_range::Int64)
-	waypoints_per_cluster = ceil(Int64,num_waypoints / num_clusters) # TODO:This shoud be random, according to model specification
+	waypoints_per_cluster = ceil(Int64,num_waypoints / num_clusters) # TODO:This shoud be random, according to the model specification
 	canvas.num_cluster = num_clusters
 	# For each cluster
-	# for i = 1:num_clusters
+	for i = 1:num_clusters
 		push!(canvas.clusters,define_cluster(canvas, waypoints_per_cluster, trasmission_range))
-	# end
+	end
 end
 
 export define_cluster
 function define_cluster(canvas::Canvas, waypoints_per_cluster::Int, trasmission_range)
-	cluster = Cluster()
+	cluster = Cluster(trasmission_range)
 	groups = generate_groups(waypoints_per_cluster)
 	last_plotted_point = Tuple{Int64,Int}((0,0))
 
 	for i in 1:length(groups)
 		println("Plotting $i group")
 		# First we plot the first point in the cluster, which has a different rule
-		if length(canvas.clusters) == 0 && i == 1  ##If I'm plotting the very first point, plot it with an uniform distribution on the canvas
+		if length(cluster.points) == 0  ##If I'm plotting the very first point, plot it with an uniform distribution on the canvas
 			last_plotted_point = generate_point(canvas)
-			println("Generated point $last_plotted_point")
+			println("First Point $i group : $last_plotted_point")
 			add_point_to_cluster(cluster,last_plotted_point)
 		else #The first point of the other groups are plotted with a Y/4 - Y/3 distance from the last plotted point
 			last_plotted_point = generate_group_first_point(canvas,last_plotted_point,cluster)
+			println("Point $i group : $last_plotted_point")
 			add_point_to_cluster(cluster,last_plotted_point)
 		end
 		for j in 2:groups[i] #Plot the other ones within 0.1R from the last plotted point
-			last_plotted_point = generate_group_internal_point(canvas,last_plotted_point,trasmission_range,cluster)
+			last_plotted_point = generate_group_internal_point(canvas,trasmission_range,cluster)
 			add_point_to_cluster(cluster,last_plotted_point)
-			println("Plotted point $j:$last_plotted_point in group $i")
 		end
 	end
 	return cluster
@@ -70,19 +70,21 @@ function generate_groups(number_waypoints::Int)
 end
 
 export generate_group_internal_point
-function generate_group_internal_point(canvas::Canvas,last_point::Tuple{Int64,Int64},R::Int64,cluster::Cluster)
+function generate_group_internal_point(canvas::Canvas,R::Int64,cluster::Cluster)
 	t = ceil(Int,0.1 * R)
-	xl = (last_point[1] - t) >= 0 ? last_point[1] - t : 0
-	xr = (last_point[1] + t) <= canvas.x ? last_point[1] + t : canvas.x
-	yb = (last_point[2] - t) >= 0 ? last_point[2] - t : 0
-	yt = (last_point[2] + t) <= canvas.y ? last_point[2] + t : canvas.y
-
+	
 	while true
+		last_point = cluster.points[rand(1:length(cluster.points))]
+		xl = (last_point[1] - t) >= 0 ? last_point[1] - t : 0
+		xr = (last_point[1] + t) <= canvas.x ? last_point[1] + t : canvas.x
+		yb = (last_point[2] - t) >= 0 ? last_point[2] - t : 0
+		yt = (last_point[2] + t) <= canvas.y ? last_point[2] + t : canvas.y
+		
 		x = rand(xl : xr) # A point inside the radious
 		y = rand(yb : yt)
 
 		d = evaluate(Euclidean(),collect(last_point),[x,y])
-		println("Point ($x,$y) -- distance $d -- t: $t")
+		# println("Point ($x,$y) -- distance $d -- t: $t")
 		if d <= t && !((x,y) in cluster.points) && !is_inside_another_cluster(canvas,(x,y))
 			return (x,y)
 		end
@@ -104,7 +106,7 @@ function generate_group_first_point(canvas::Canvas,last_point::Tuple{Int64,Int64
 		y = ceil(Int,rand(yb : yt))
 
 		d = evaluate(Euclidean(),collect(last_point),[x,y])
-		println("Point ($x,$y) -- distance $d -- Y/3:$(Y/3) -- Y/4:$(Y/4) -- Y: $Y")
+		# println("Point ($x,$y) -- distance $d -- Y/3:$(Y/3) -- Y/4:$(Y/4) -- Y: $Y")
 		if d >= Y/4 && d <= Y/3 && !((x,y) in cluster.points) && !is_inside_another_cluster(canvas,(x,y))
 			return (x,y)
 		end
@@ -136,5 +138,6 @@ function is_inside_another_cluster(canvas::Canvas, point::Tuple)
 		return false
 	end
 end
+
 
 end

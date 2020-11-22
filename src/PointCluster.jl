@@ -9,10 +9,11 @@ export Cluster
 mutable struct Cluster
 	points::Vector{Tuple{Int64,Int64}}
 	graph::SimpleWeightedGraph
-	rect::Rect
+	boundary::Rect
+	bound::Int64
 end
 
-Cluster() = Cluster([],SimpleWeightedGraph(0), Rect([ [0,0] [0,0] ]))
+Cluster(bound::Int64) = Cluster([],SimpleWeightedGraph(0), Rect([ [0,0] [0,0] ]),bound)
 
 
 export add_point_to_cluster
@@ -40,15 +41,15 @@ end
 export update_rect
 function update_rect(cluster::Cluster,p::Tuple{Int64,Int64})
 	if length(cluster.points) == 1
-		cluster.rect = Rect([[p[1],p[2]] [p[1],p[2]]  ])
+		cluster.boundary = Rect([[p[1],p[2]] [p[1],p[2]]  ])
 		return
 	end
 	
-	x1,x2 = x(cluster.rect)
-	y1,y2 = y(cluster.rect)
+	x1,x2 = x(cluster.boundary)
+	y1,y2 = y(cluster.boundary)
 
 	if length(cluster.points) == 2
-		cluster.rect = Rect(x1,y1,p[1],p[2])
+		cluster.boundary = Rect(x1,y1,p[1],p[2])
 		return
 	end
 
@@ -57,13 +58,12 @@ function update_rect(cluster::Cluster,p::Tuple{Int64,Int64})
 	y1 = min(y1,p[2])
 	y2 = max(y2,p[2])
 
-	cluster.rect = Rect(x1,y1,x2,y2)
-	println(cluster.rect)
+	cluster.boundary = Rect(x1,y1,x2,y2)
 end
 
 export is_inside_cluster
 function is_inside_cluster(cluster::Cluster,p::Tuple{Int64,Int64})
-	return inside(p,cluster.rect)
+	return inside(p,cluster.boundary)
 end
 
 end

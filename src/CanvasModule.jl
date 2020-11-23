@@ -32,6 +32,7 @@ function define_cluster(canvas::Canvas, waypoints_per_cluster::Int, trasmission_
 	last_plotted_point = Tuple{Int64,Int}((0,0))
 
 	for i in 1:length(groups)
+		group_points = []
 		println("Plotting $i group")
 		# First we plot the first point in the cluster, which has a different rule
 		if length(cluster.points) == 0  ##If I'm plotting the very first point, plot it with an uniform distribution on the canvas
@@ -43,8 +44,11 @@ function define_cluster(canvas::Canvas, waypoints_per_cluster::Int, trasmission_
 			println("Point $i group : $last_plotted_point")
 			add_point_to_cluster(cluster,last_plotted_point)
 		end
+		push!(group_points,last_plotted_point)
+
 		for j in 2:groups[i] #Plot the other ones within 0.1R from the last plotted point
-			last_plotted_point = generate_group_internal_point(canvas,trasmission_range,cluster)
+			last_plotted_point = generate_group_internal_point(canvas,trasmission_range,cluster,group_points)
+			push!(group_points,last_plotted_point)
 			add_point_to_cluster(cluster,last_plotted_point)
 		end
 	end
@@ -61,7 +65,7 @@ function generate_groups(number_waypoints::Int)
 			waypoints_remained = 0
 			continue
 		end
-
+		
 		current_dim = rand(1:waypoints_remained)
 		push!(groups,current_dim)
 		waypoints_remained = waypoints_remained - current_dim	
@@ -70,11 +74,11 @@ function generate_groups(number_waypoints::Int)
 end
 
 export generate_group_internal_point
-function generate_group_internal_point(canvas::Canvas,R::Int64,cluster::Cluster)
+function generate_group_internal_point(canvas::Canvas,R::Int64,cluster::Cluster,group_points::Array{Tuple{Int64,Int64}})
 	t = ceil(Int,0.1 * R)
 	
 	while true
-		last_point = cluster.points[rand(1:length(cluster.points))]
+		last_point = group_points[rand(1:length(group_points))]
 		xl = (last_point[1] - t) >= 0 ? last_point[1] - t : 0
 		xr = (last_point[1] + t) <= canvas.x ? last_point[1] + t : canvas.x
 		yb = (last_point[2] - t) >= 0 ? last_point[2] - t : 0

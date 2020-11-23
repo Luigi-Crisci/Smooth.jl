@@ -17,14 +17,20 @@ function latp_algorithm(G::SimpleWeightedGraph,s::Int,alpha::Int)
 
 	next = 0
 	while V != Visited
-		p = -1
-		prob_sum = sum( map( d->(1/d)^alpha ,[ G.weights[c,i] for i in setdiff(neighbors(g,c),Visited)]))
-		for v in 1:setdiff(V,Visited)
-			current_prob = ((1/G.weights[c,v]) ^ alpha) / prob_sum
-			if current_prob > p
-				p = current_prob
-				next = v
-			end
+		#Firstly, get all unvisited nodes next to current node and order them in closeness
+		neighbors_ordered = sort([ (G.weights[c,i],i) for i in setdiff(neighbors(g,c),Visited)])
+		#Then the probability vector is calculated
+		prob_vector = map( d->(1/d[1])^alpha, neighbors_ordered)
+		prob_sum = sum( prob_vector )
+		prob_vector = map( d -> d / prob_sum, prob_vector)
+		#Find node: the probability of selecting a node i is the sum of the probability of all preceiding probs
+		p = rand()
+		for i in 1:length(neighbors_ordered)
+			if p <= sum(prob_vector[1:i])
+				next = neighbors_ordered[i][2]
+				break
+		end
+
 		push!(Visited,next) 
 		c = next
 	end

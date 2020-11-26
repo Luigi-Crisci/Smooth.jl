@@ -10,6 +10,7 @@ using LightGraphs,SimpleWeightedGraphs
 """
 latp_algorithm(G::SimpleWeightedGraph,s::Int,alpha::Int)
 export latp_algorithm
+#TODO: Pause time for each node
 function latp_algorithm(G::SimpleWeightedGraph,s::Int,alpha::Int)
 	V = Set(vertices(G))
 	Visited = Set(s)

@@ -1,6 +1,7 @@
 module CanvasModule
 
 include("PointCluster.jl")
+include("Utils.jl")
 using .PointCluster
 using Random
 using Distances
@@ -17,7 +18,7 @@ Canvas(x::Int64,y::Int64) = Canvas(x, y, [], 0)
 
 export initialize
 function initialize(canvas::Canvas, num_clusters::Int64, num_waypoints::Int64, trasmission_range::Int64)
-	waypoints_per_cluster = ceil(Int64,num_waypoints / num_clusters) # TODO:This shoud be random, according to the model specification
+	waypoints_per_cluster = random_array_fixed_sum(num_waypoints,num_clusters)
 	canvas.num_cluster = num_clusters
 	# For each cluster
 	for i = 1:num_clusters
@@ -27,8 +28,8 @@ end
 
 export define_cluster
 function define_cluster(canvas::Canvas, waypoints_per_cluster::Int, trasmission_range)
-	cluster = Cluster(trasmission_range)
-	groups = generate_groups(waypoints_per_cluster)
+	cluster = Cluster(trasmission_range,canvas.x,canvas.y)
+	groups = random_array_fixed_sum(waypoints_per_cluster,rand(1:waypoints_per_cluster))
 	last_plotted_point = Tuple{Int64,Int}((0,0))
 
 	for i in 1:length(groups)
@@ -55,23 +56,6 @@ function define_cluster(canvas::Canvas, waypoints_per_cluster::Int, trasmission_
 	return cluster
 end
 
-## Different-size groups generation, needed for each cluster 
-function generate_groups(number_waypoints::Int)
-	waypoints_remained = number_waypoints
-	groups = Array{Int64,1}()
-	while waypoints_remained > 0
-		if waypoints_remained < 5
-			push!(groups,waypoints_remained)
-			waypoints_remained = 0
-			continue
-		end
-		
-		current_dim = rand(1:waypoints_remained)
-		push!(groups,current_dim)
-		waypoints_remained = waypoints_remained - current_dim	
-	end
-	return groups
-end
 
 #TODO: Collapse point generation point functions into one, with acceptance funcion as parameter 
 export generate_group_internal_point

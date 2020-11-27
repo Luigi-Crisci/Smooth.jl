@@ -1,12 +1,4 @@
-module CanvasModule
 
-include("PointCluster.jl")
-include("Utils.jl")
-using .PointCluster
-using Random
-using Distances
-
-export Canvas
 mutable struct Canvas
 	x::Int64
 	y::Int64
@@ -16,7 +8,6 @@ end
 
 Canvas(x::Int64,y::Int64) = Canvas(x, y, [], 0)
 
-export initialize
 function initialize(canvas::Canvas, num_clusters::Int64, num_waypoints::Int64, trasmission_range::Int64)
 	waypoints_per_cluster = random_array_fixed_sum(num_waypoints,num_clusters)
 	canvas.num_cluster = num_clusters
@@ -26,7 +17,6 @@ function initialize(canvas::Canvas, num_clusters::Int64, num_waypoints::Int64, t
 	end
 end
 
-export define_cluster
 function define_cluster(canvas::Canvas, waypoints_per_cluster::Int, trasmission_range)
 	cluster = Cluster(trasmission_range,canvas.x,canvas.y)
 	groups = random_array_fixed_sum(waypoints_per_cluster,rand(1:waypoints_per_cluster))
@@ -34,15 +24,15 @@ function define_cluster(canvas::Canvas, waypoints_per_cluster::Int, trasmission_
 
 	for i in 1:length(groups)
 		group_points = Tuple{Int64,Int64}[]
-		println("Plotting $i group")
+		# println("Plotting $i group")
 		# First we plot the first point in the cluster, which has a different rule
 		if length(cluster.points) == 0  ##If I'm plotting the very first point, plot it with an uniform distribution on the canvas
 			last_plotted_point = generate_point(canvas)
-			println("First Point $i group : $last_plotted_point")
+			# println("First Point $i group : $last_plotted_point")
 			add_point_to_cluster(cluster,last_plotted_point)
 		else #The first point of the other groups are plotted with a Y/4 - Y/3 distance from the last plotted point
 			last_plotted_point = generate_group_first_point(canvas,last_plotted_point,cluster)
-			println("Point $i group : $last_plotted_point")
+			# println("Point $i group : $last_plotted_point")
 			add_point_to_cluster(cluster,last_plotted_point)
 		end
 		push!(group_points,last_plotted_point)
@@ -58,7 +48,6 @@ end
 
 
 #TODO: Collapse point generation point functions into one, with acceptance funcion as parameter 
-export generate_group_internal_point
 function generate_group_internal_point(canvas::Canvas,R::Int64,cluster::Cluster,group_points::Array{Tuple{Int64,Int64}})
 	t = ceil(Int,0.1 * R)
 	
@@ -80,7 +69,6 @@ function generate_group_internal_point(canvas::Canvas,R::Int64,cluster::Cluster,
 	end
 end
 
-export generate_group_first_point
 function generate_group_first_point(canvas::Canvas,last_point::Tuple{Int64,Int64},cluster::Cluster)
 	# Y = round(Int,(2 * canvas.x * canvas.y) / canvas.num_cluster)
 	Y = round(Int,(canvas.x ) / canvas.num_cluster)
@@ -103,7 +91,7 @@ function generate_group_first_point(canvas::Canvas,last_point::Tuple{Int64,Int64
 end
 
 # Get a poin in the Canvas
-export generate_point
+
 function generate_point(canvas::Canvas)
 	while true
 		p = (rand(0:canvas.x) , rand(0:canvas.y))
@@ -114,7 +102,6 @@ function generate_point(canvas::Canvas)
 		
 end
 
-export is_inside_another_cluster
 function is_inside_another_cluster(canvas::Canvas, point::Tuple)
 	if length(canvas.clusters) == 0
 		return false
@@ -126,7 +113,4 @@ function is_inside_another_cluster(canvas::Canvas, point::Tuple)
 		end
 		return false
 	end
-end
-
-
 end

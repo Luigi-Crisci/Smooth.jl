@@ -1,12 +1,3 @@
-module PointCluster
-include("Utils.jl")
-
-using LightGraphs, SimpleWeightedGraphs
-using Rectangle
-using Distances
-
-export Cluster
-
 mutable struct Cluster
 	points::Vector{Tuple{Int64,Int64}}
 	boundary::Rect
@@ -17,7 +8,6 @@ end
 
 Cluster(r::Int64,x_bound::Int64,y_bound::Int64) = Cluster([], Rect([ [0,0] [0,0] ]),r,x_bound,y_bound)
 
-export add_point_to_cluster
 function add_point_to_cluster(cluster::Cluster,p::Tuple{Int64,Int64})
 	if p in cluster.points
 		return false
@@ -32,7 +22,7 @@ function node_distance(p1::Tuple,p2::Tuple)
 	return round(evaluate(Euclidean(),collect(p1),collect(p2)),digits=3)
 end
 
-export update_rect
+
 function update_rect(cluster::Cluster,p::Tuple{Int64,Int64})
 	if length(cluster.points) == 1
 		cluster.boundary = Rect( bounded_diff(p[1],cluster.r,0),
@@ -60,9 +50,7 @@ function update_rect(cluster::Cluster,p::Tuple{Int64,Int64})
 	cluster.boundary = Rect(x1,y1,x2,y2)
 end
 
-export is_inside_cluster
+
 function is_inside_cluster(cluster::Cluster,p::Tuple{Int64,Int64})
 	return inside(p,cluster.boundary)
-end
-
 end

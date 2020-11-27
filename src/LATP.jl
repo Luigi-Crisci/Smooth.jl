@@ -1,8 +1,3 @@
-module LATP
-
-using LightGraphs,SimpleWeightedGraphs
-using Random
-
 """
 ```julia
 	latp_algorithm(G:SimpleWeightedGraph,s::Int)
@@ -10,7 +5,6 @@ using Random
 	Perform the *Least-Action trip planning* algorithm on G, starting from s with alpha parameter
 """
 latp_algorithm(G::SimpleWeightedGraph,s::Int,alpha::Int)
-export latp_algorithm
 
 function latp_algorithm(G::SimpleWeightedGraph,s::Int,alpha::Int)
 	V = Set(vertices(G))
@@ -40,5 +34,3 @@ function latp_algorithm(G::SimpleWeightedGraph,s::Int,alpha::Int)
 	end
 	return c
 end
-
-end	

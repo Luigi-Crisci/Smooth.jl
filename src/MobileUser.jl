@@ -1,13 +1,3 @@
-module MobileUserModule
-include("CanvasModule.jl")
-include("PointCluster.jl")
-include("LATP.jl")
-
-using .CanvasModule,.PointCluster,.LATP
-using LightGraphs,SimpleWeightedGraphs
-using Distances
-
-export MobileUser
 mutable struct MobileUser
 	id::Int
 	starting_point::Tuple{Int64,Int64}
@@ -49,6 +39,4 @@ end
 
 function node_distance(p1::Tuple,p2::Tuple)
 	return round(evaluate(Euclidean(),collect(p1),collect(p2)),digits=3)
-end
-
 end

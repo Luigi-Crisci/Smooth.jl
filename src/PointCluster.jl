@@ -1,10 +1,9 @@
 module PointCluster
-
 include("Utils.jl")
+
 using LightGraphs, SimpleWeightedGraphs
 using Rectangle
 using Distances
-using .Utils
 
 export Cluster
 
@@ -25,11 +24,6 @@ function add_point_to_cluster(cluster::Cluster,p::Tuple{Int64,Int64})
 	end
 
 	push!(cluster.points,p)
-	add_vertex!(cluster.graph)
-	for i = 1:nv(cluster.graph)-1
-		add_edge!(cluster.graph,i,nv(cluster.graph),
-					node_distance(cluster.points[i],cluster.points[nv(cluster.graph)]))
-	end
 	update_rect(cluster::Cluster,p::Tuple{Int64,Int64})
 	return true
 end
@@ -41,11 +35,10 @@ end
 export update_rect
 function update_rect(cluster::Cluster,p::Tuple{Int64,Int64})
 	if length(cluster.points) == 1
-		cluster.boundary = Rect(
-							[[bounded_diff(p[1],cluster.r,0),
-							  bounded_diff(p[2],cluster.r,0)]
-							 [bounded_sum(p[1],cluster.r,cluster.x_bound),
-							  bounded_sum(p[2],cluster.r,cluster.y_bound)]])
+		cluster.boundary = Rect( bounded_diff(p[1],cluster.r,0),
+							  	 bounded_diff(p[2],cluster.r,0),
+							 	 bounded_sum(p[1],cluster.r,cluster.x_bound),
+							  	 bounded_sum(p[2],cluster.r,cluster.y_bound))
 		return
 	end
 	

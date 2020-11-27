@@ -22,7 +22,7 @@ function initialize(canvas::Canvas, num_clusters::Int64, num_waypoints::Int64, t
 	canvas.num_cluster = num_clusters
 	# For each cluster
 	for i = 1:num_clusters
-		push!(canvas.clusters,define_cluster(canvas, waypoints_per_cluster, trasmission_range))
+		push!(canvas.clusters,define_cluster(canvas, waypoints_per_cluster[i], trasmission_range))
 	end
 end
 
@@ -30,10 +30,10 @@ export define_cluster
 function define_cluster(canvas::Canvas, waypoints_per_cluster::Int, trasmission_range)
 	cluster = Cluster(trasmission_range,canvas.x,canvas.y)
 	groups = random_array_fixed_sum(waypoints_per_cluster,rand(1:waypoints_per_cluster))
-	last_plotted_point = Tuple{Int64,Int}((0,0))
+	last_plotted_point = Tuple{Int64,Int64}((0,0))
 
 	for i in 1:length(groups)
-		group_points = []
+		group_points = Tuple{Int64,Int64}[]
 		println("Plotting $i group")
 		# First we plot the first point in the cluster, which has a different rule
 		if length(cluster.points) == 0  ##If I'm plotting the very first point, plot it with an uniform distribution on the canvas

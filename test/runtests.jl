@@ -7,7 +7,7 @@ using Test
 using Smooth
 using Plots
 
-open("log.log","w") do io
+# open("log.log","w") do io
 #     redirect_stdout(io)
 # end
 
@@ -31,7 +31,7 @@ savefig("canvas.png")
 
 #Make a move
 m = MobileUser(0,(100,100),canvas,1,0.3)
-move(m)
+move(m,1)
 
 end
 

@@ -10,28 +10,41 @@ MobileUser(id::Int,canvas::Canvas,start_point::Tuple{Int64,Int64},alpha::Int,y::
 
 function move(m::MobileUser,iterations::Int64)
 
-	logfile = open("results/log_$(m.id).csv","a+")
-	write(logfile,"ID;node;time")
+	T = DateTime(0)
+	logfile = open("log_$(m.id).csv","a+")
+	write(logfile,"ID;cluster;node;time")
+	
 	for iteration in 1:iterations
 		#Select cluster proportional to the size
-		cluster = select_cluster(m.canvas.clusters)
+		cluster_index, cluster = select_cluster(m.canvas.clusters)
+		println("Select cluster $cluster_index")
 		#Select y% subset of cluster waypoints
 		num_waypoints = round(Int64,length(cluster.points) * m.y)
+		println("Num waypoints selected $num_waypoints")
 		#Extract subpoint list from the cluster
 		vertex_list = rand(1:length(cluster.points),num_waypoints)
+		println("vertex selected: $vertex_list")
 		point_list = [cluster.points[i] for i in vertex_list]
 		#Add the mobile node to the graph
 		push!(point_list,m.starting_point)
 		#Generate subgraph
 		subgraph = generate_graph(point_list)
 		#Visit node with LATP algorithm, starting from the node position
-		last_node_visited =  latp_algorithm(m,subgraph,nv(subgraph),m.alpha)
+		visiting_order =  latp_algorithm(subgraph, nv(subgraph), m.alpha,T)
+		last_node_visited = visiting_order[length(visiting_order)][1]
 		m.starting_point =	point_list[last_node_visited]
+		
+		for node in visiting_order
+			write(logfile,"$(m.id);$cluster_index;$(node[1]);$(node[2])\n")
+		end
+
 	end
+	close(logfile)
 end
 
 #TODO: This would be more efficient if the edge weights are generated first and then the Graph is constructed, according to SimpleWeightedGraph doc
 function generate_graph(point_list::Array{Tuple{Int64,Int64},1})
+	println(point_list)
 	g = SimpleWeightedGraph()
 	for j in 1:length(point_list)
 		add_vertex!(g)
@@ -39,6 +52,7 @@ function generate_graph(point_list::Array{Tuple{Int64,Int64},1})
 			add_edge!( g, i, nv(g), node_distance(point_list[i],point_list[nv(g)]))
 		end
 	end
+	println(g)
 	return g
 end
 
@@ -57,5 +71,5 @@ function select_cluster(clusters::Vector{Cluster})
 				break
 			end
 		end
-		return clusters[next]
+		return next, clusters[next]
 end

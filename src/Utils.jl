@@ -25,3 +25,18 @@ end
 function node_distance(p1::Tuple,p2::Tuple)
 	return round(evaluate(Euclidean(),collect(p1),collect(p2)),digits=3)
 end
+
+
+function random_elements_from_array(S::Array,num::Int)
+	if(length(S) >= num)
+		return S
+
+	V = copy(S)
+	chosed = []
+	while length(chosed) < num
+		e = rand(S)
+		S = setdiff(S,[e])
+		push!(chosed,e)
+	end
+	return chosed
+end

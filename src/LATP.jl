@@ -6,10 +6,11 @@
 """
 latp_algorithm(G::SimpleWeightedGraph,s::Int,alpha::Int)
 
-function latp_algorithm(m::MobileUser,G::SimpleWeightedGraph,s::Int,alpha::Int,stream)
+function latp_algorithm(G::SimpleWeightedGraph,s::Int,alpha::Int,T::DateTime)
 	V = Set(vertices(G))
 	Random.seed!(time_ns())
-	Visited = Set(s)
+	Visited = [s] #It's a vector because we need to maintain visiting order
+	Visited_time = [T]
 	c = s
 
 	next = 0
@@ -22,19 +23,16 @@ function latp_algorithm(m::MobileUser,G::SimpleWeightedGraph,s::Int,alpha::Int,s
 		prob_vector = map( d -> d / prob_sum, prob_vector)
 		#Find node: the probability of selecting a node i is the sum of the probability of all preceiding probs
 		p = rand()
-		p_next = 0
 		for i in 1:length(neighbors_ordered)
 			if p <= sum(prob_vector[1:i])
 				next = neighbors_ordered[i][2]
-				p_next = prob_vector[i]
 				break
 			end
 		end
 		#TODO: Add pause time
-		write(stream,"")
-		println("p: $p -- node: $next -- prob_node: $p_next")
-		push!(Visited,next) 
+		push!(Visited,next)
+		push!(Visited_time,Visited_time[length(Visited_time)] + Dates.Millisecond(10)) #10 Millisecond, just a test
 		c = next
 	end
-	return c
+	return [ (Visited[i],Visited_time[i]) for i in 1:length(Visited) ] #Combine visited nodes with timestamp
 end

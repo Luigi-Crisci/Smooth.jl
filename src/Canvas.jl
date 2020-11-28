@@ -6,6 +6,8 @@ mutable struct Canvas
 	num_cluster::Int64
 end
 
+MAX_ITERATION = 100000
+
 Canvas(x::Int64,y::Int64) = Canvas(x, y, [], 0)
 
 function initialize(canvas::Canvas, num_clusters::Int64, num_waypoints::Int64, trasmission_range::Int64)
@@ -50,7 +52,7 @@ end
 #TODO: Collapse point generation point functions into one, with acceptance funcion as parameter 
 function generate_group_internal_point(canvas::Canvas,R::Int64,cluster::Cluster,group_points::Array{Tuple{Int64,Int64}})
 	t = ceil(Int,0.1 * R)
-	
+	current_iterations = 0
 	while true
 		last_point = group_points[rand(1:length(group_points))]
 		xl = (last_point[1] - t) >= 0 ? last_point[1] - t : 0
@@ -66,6 +68,11 @@ function generate_group_internal_point(canvas::Canvas,R::Int64,cluster::Cluster,
 		if d <= t && !((x,y) in cluster.points) && !is_inside_another_cluster(canvas,(x,y))
 			return (x,y)
 		end
+		current_iterations +=1
+		if current_iterations > MAX_ITERATION
+			throw(ErrorException("Unable to plot point, the graph is too dense. 
+						Try reducing trasmission range or reduce waypoints number"))
+		end
 	end
 end
 
@@ -78,6 +85,7 @@ function generate_group_first_point(canvas::Canvas,last_point::Tuple{Int64,Int64
 	yb = (last_point[2] - Y/3) >= 0 ? last_point[2] - Y/3 : 0
 	yt = (last_point[2] + Y/3) <= canvas.y ? last_point[2] + Y/3 : canvas.y
 
+	current_iterations = 0
 	while true
 		x = ceil(Int,rand(xl : xr)) # A point inside the radious
 		y = ceil(Int,rand(yb : yt))
@@ -86,6 +94,11 @@ function generate_group_first_point(canvas::Canvas,last_point::Tuple{Int64,Int64
 		# println("Point ($x,$y) -- distance $d -- Y/3:$(Y/3) -- Y/4:$(Y/4) -- Y: $Y")
 		if d >= Y/4 && d <= Y/3 && !((x,y) in cluster.points) && !is_inside_another_cluster(canvas,(x,y))
 			return (x,y)
+		end
+		current_iterations +=1
+		if current_iterations > MAX_ITERATION
+			throw(ErrorException("Unable to plot point, the graph is too dense. 
+						Try reducing trasmission range or reduce waypoints number"))
 		end
 	end
 end
@@ -107,7 +120,9 @@ function is_inside_another_cluster(canvas::Canvas, point::Tuple)
 		return false
 	else
 		for i in 1:length(canvas.clusters)
+			# println("Checking point $point inside $(canvas.clusters[i].boundary)")
 			if is_inside_cluster(canvas.clusters[i], point)
+				# print("Is inside another is_inside_another_cluster")
 				return true
 			end
 		end

@@ -6,7 +6,7 @@
 """
 latp_algorithm(G::SimpleWeightedGraph,s::Int,alpha::Int)
 
-function latp_algorithm(G::SimpleWeightedGraph,s::Int,alpha::Int)
+function latp_algorithm(m::MobileUser,G::SimpleWeightedGraph,s::Int,alpha::Int,stream)
 	V = Set(vertices(G))
 	Random.seed!(time_ns())
 	Visited = Set(s)
@@ -22,13 +22,17 @@ function latp_algorithm(G::SimpleWeightedGraph,s::Int,alpha::Int)
 		prob_vector = map( d -> d / prob_sum, prob_vector)
 		#Find node: the probability of selecting a node i is the sum of the probability of all preceiding probs
 		p = rand()
+		p_next = 0
 		for i in 1:length(neighbors_ordered)
 			if p <= sum(prob_vector[1:i])
 				next = neighbors_ordered[i][2]
+				p_next = prob_vector[i]
 				break
 			end
 		end
-		#TODO: Add pause time 
+		#TODO: Add pause time
+		write(stream,"")
+		println("p: $p -- node: $next -- prob_node: $p_next")
 		push!(Visited,next) 
 		c = next
 	end

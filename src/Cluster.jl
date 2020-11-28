@@ -18,10 +18,6 @@ function add_point_to_cluster(cluster::Cluster,p::Tuple{Int64,Int64})
 	return true
 end
 
-function node_distance(p1::Tuple,p2::Tuple)
-	return round(evaluate(Euclidean(),collect(p1),collect(p2)),digits=3)
-end
-
 
 function update_rect(cluster::Cluster,p::Tuple{Int64,Int64})
 	if length(cluster.points) == 1

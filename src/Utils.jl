@@ -1,7 +1,3 @@
-export bounded_sum
-export bounded_diff
-export random_array_fixed_sum
-
 function bounded_sum(x::Int64,y::Int64,bound::Int64)
 	return x + y < bound ? x + y : bound
 end
@@ -24,4 +20,8 @@ function random_array_fixed_sum(sum_value::Int64,array_size::Int64)
 	push!(array,total)
 
 	return array
+end
+
+function node_distance(p1::Tuple,p2::Tuple)
+	return round(evaluate(Euclidean(),collect(p1),collect(p2)),digits=3)
 end

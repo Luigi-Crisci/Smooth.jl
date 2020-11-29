@@ -1,8 +1,3 @@
-# using Smooth
-
-# @testset "Smooth.jl" begin
-# end
-
 using Test
 using Smooth
 using Plots
@@ -16,7 +11,7 @@ X_DIM = 1800
 Y_DIM = 1800
 
 canvas = Canvas(X_DIM, Y_DIM)
-initialize(canvas,1,100,10)
+initialize(canvas,20,2000,10)
 
 Points = collect(Iterators.flatten([canvas.clusters[i].points for i in 1:length(canvas.clusters)]))
 X = [ Points[i][1] for i in 1:length(Points) ]
@@ -31,7 +26,7 @@ savefig("canvas.png")
 
 #Make a move
 m = MobileUser(0,(100,100),canvas,1,0.3)
-move(m,1)
+move(m,30)
 
 end
 

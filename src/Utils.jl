@@ -28,14 +28,15 @@ end
 
 
 function random_elements_from_array(S::Array,num::Int)
-	if(length(S) >= num)
+	if length(S) <= num
 		return S
+	end
 
 	V = copy(S)
 	chosed = []
 	while length(chosed) < num
 		e = rand(S)
-		S = setdiff(S,[e])
+		setdiff!(S,[e])
 		push!(chosed,e)
 	end
 	return chosed

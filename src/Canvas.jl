@@ -52,8 +52,10 @@ end
 #TODO: Collapse point generation point functions into one, with acceptance funcion as parameter 
 function generate_group_internal_point(canvas::Canvas,R::Int64,cluster::Cluster,group_points::Array{Tuple{Int64,Int64}})
 	t = ceil(Int,0.1 * R)
+	
 	current_iterations = 0
 	while true
+		println(current_iterations)
 		last_point = group_points[rand(1:length(group_points))]
 		xl = (last_point[1] - t) >= 0 ? last_point[1] - t : 0
 		xr = (last_point[1] + t) <= canvas.x ? last_point[1] + t : canvas.x
@@ -87,6 +89,7 @@ function generate_group_first_point(canvas::Canvas,last_point::Tuple{Int64,Int64
 
 	current_iterations = 0
 	while true
+		println(current_iterations)
 		x = ceil(Int,rand(xl : xr)) # A point inside the radious
 		y = ceil(Int,rand(yb : yt))
 
@@ -106,10 +109,17 @@ end
 # Get a poin in the Canvas
 
 function generate_point(canvas::Canvas)
+	current_iterations = 0
 	while true
+		println(current_iterations)
 		p = (rand(0:canvas.x) , rand(0:canvas.y))
 		if !is_inside_another_cluster(canvas,p)
 			return p
+		end
+		current_iterations +=1
+		if current_iterations > MAX_ITERATION
+			throw(ErrorException("Unable to plot point, the graph is too dense. 
+						Try reducing trasmission range or reduce waypoints number"))
 		end
 	end
 		

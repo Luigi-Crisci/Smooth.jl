@@ -14,7 +14,7 @@ function latp_algorithm(G::SimpleWeightedGraph,s::Int,alpha::Int,T::DateTime)
 	c = s
 
 	next = 0
-	while V != Visited
+	while length(setdiff(V,Visited)) != 0
 		#Firstly, get all unvisited nodes next to current node and order them in closeness
 		neighbors_ordered = sort([ (G.weights[c,i],i) for i in setdiff(neighbors(G,c),Visited)])
 		#Then the probability vector is calculated

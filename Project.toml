@@ -18,6 +18,7 @@ Suppressor = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
 VisualRegressionTests = "34922c18-7c2a-561c-bac1-01e79b2c4c92"
 
 [compat]
+Suppressor = "0.2"
 julia = "1"
 
 [extras]
